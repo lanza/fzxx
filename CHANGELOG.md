@@ -1,3 +1,16 @@
+## 1.0 (Unreleased)
+
+Features:
+
+  - Support UTF-8
+  - Support readline-like editing
+  - Quit on Esc
+  - Redraw on terminal resize
+
+Performance:
+
+  - Interface is now initialized before stdin is read
+
 ## 0.9 (2017-04-17)
 
 Features:
