@@ -4,8 +4,8 @@
 #include <string.h>
 
 #include "../config.h"
-#include "match.h"
-#include "tty_interface.h"
+#include "fzxx/match.h"
+#include "fzxx/tty_interface.h"
 
 static int isprint_unicode(char c) { return isprint(c) || c & (1 << 7); }
 

@@ -7,7 +7,7 @@
 #include <termios.h>
 #include <unistd.h>
 
-#include "tty.h"
+#include "fzxx/tty.h"
 
 #include "../config.h"
 

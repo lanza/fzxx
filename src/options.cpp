@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "options.h"
+#include "fzxx/options.h"
 
 static const char *usage_str =
     ""

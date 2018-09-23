@@ -5,11 +5,11 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "choices.h"
-#include "match.h"
-#include "options.h"
-#include "tty.h"
-#include "tty_interface.h"
+#include "fzxx/choices.h"
+#include "fzxx/match.h"
+#include "fzxx/options.h"
+#include "fzxx/tty.h"
+#include "fzxx/tty_interface.h"
 
 #include "../config.h"
 
