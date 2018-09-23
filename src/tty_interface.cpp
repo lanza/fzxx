@@ -12,23 +12,23 @@ static int isprint_unicode(char c) { return isprint(c) || c & (1 << 7); }
 static int is_boundary(char c) { return ~c & (1 << 7) || c & (1 << 6); }
 
 static void clear(tty_interface_t *state) {
-  tty_t *tty = state->tty;
+  TTYWrapper *tty = state->tty;
 
-  tty_setcol(tty, 0);
+  tty->setcol(0);
   size_t line = 0;
   while (line++ < state->options->num_lines) {
-    tty_newline(tty);
+    tty->newline();
   }
-  tty_clearline(tty);
+  tty->clearline();
   if (state->options->num_lines > 0) {
-    tty_moveup(tty, line - 1);
+    tty->moveup(line - 1);
   }
-  tty_flush(tty);
+  tty->flush();
 }
 
 static void draw_match(tty_interface_t *state, const char *choice,
                        int selected) {
-  tty_t *tty = state->tty;
+  TTYWrapper *tty = state->tty;
   options_t *options = state->options;
   char *search = state->last_search;
 
@@ -41,35 +41,35 @@ static void draw_match(tty_interface_t *state, const char *choice,
 
   if (options->show_scores) {
     if (score == SCORE_MIN) {
-      tty_printf(tty, "(     ) ");
+      tty->printf("(     ) ");
     } else {
-      tty_printf(tty, "(%5.2f) ", score);
+      tty->printf("(%5.2f) ", score);
     }
   }
 
   if (selected)
 #ifdef TTY_SELECTION_UNDERLINE
-    tty_setunderline(tty);
+    tty->setunderline();
 #else
-    tty_setinvert(tty);
+    tty->setinvert();
 #endif
 
-  tty_setnowrap(tty);
+  tty->setnowrap();
   for (size_t i = 0, p = 0; choice[i] != '\0'; i++) {
     if (positions[p] == i) {
-      tty_setfg(tty, TTY_COLOR_HIGHLIGHT);
+      tty->setfg(TTY_COLOR_HIGHLIGHT);
       p++;
     } else {
-      tty_setfg(tty, TTY_COLOR_NORMAL);
+      tty->setfg(TTY_COLOR_NORMAL);
     }
-    tty_printf(tty, "%c", choice[i]);
+    tty->printf("%c", choice[i]);
   }
-  tty_setwrap(tty);
-  tty_setnormal(tty);
+  tty->setwrap();
+  tty->setnormal();
 }
 
 static void draw(tty_interface_t *state) {
-  tty_t *tty = state->tty;
+  TTYWrapper *tty = state->tty;
   choices_t *choices = state->choices;
   options_t *options = state->options;
 
@@ -83,26 +83,26 @@ static void draw(tty_interface_t *state) {
       start = available - num_lines;
     }
   }
-  tty_setcol(tty, 0);
-  tty_printf(tty, "%s%s", options->prompt, state->search);
-  tty_clearline(tty);
+  tty->setcol(0);
+  tty->printf("%s%s", options->prompt, state->search);
+  tty->clearline();
   for (size_t i = start; i < start + num_lines; i++) {
-    tty_printf(tty, "\n");
-    tty_clearline(tty);
+    tty->printf("\n");
+    tty->clearline();
     const char *choice = choices_get(choices, i);
     if (choice) {
       draw_match(state, choice, i == choices->selection);
     }
   }
   if (num_lines > 0) {
-    tty_moveup(tty, num_lines);
+    tty->moveup(num_lines);
   }
 
-  tty_setcol(tty, 0);
+  tty->setcol(0);
   fputs(options->prompt, tty->fout);
   for (size_t i = 0; i < state->cursor; i++)
     fputc(state->search[i], tty->fout);
-  tty_flush(tty);
+  tty->flush();
 }
 
 static void update_search(tty_interface_t *state) {
@@ -124,7 +124,7 @@ static void action_emit(tty_interface_t *state) {
   clear(state);
 
   /* ttyout should be flushed before outputting on stdout */
-  tty_close(state->tty);
+  state->tty->close();
 
   const char *selection =
       choices_get(state->choices, state->choices->selection);
@@ -240,7 +240,7 @@ static void action_autocomplete(tty_interface_t *state) {
 
 static void action_exit(tty_interface_t *state) {
   clear(state);
-  tty_close(state->tty);
+  state->tty->close();
 
   state->exit = EXIT_FAILURE;
 }
@@ -257,8 +257,8 @@ static void append_search(tty_interface_t *state, char ch) {
   }
 }
 
-void tty_interface_init(tty_interface_t *state, tty_t *tty, choices_t *choices,
-                        options_t *options) {
+void tty_interface_init(tty_interface_t *state, TTYWrapper *tty,
+                        choices_t *choices, options_t *options) {
   state->tty = tty;
   state->choices = choices;
   state->options = options;
@@ -373,14 +373,14 @@ int tty_interface_run(tty_interface_t *state) {
 
   for (;;) {
     do {
-      char s[2] = {tty_getchar(state->tty), '\0'};
+      char s[2] = {state->tty->getchar(), '\0'};
       handle_input(state, s, 0);
 
       if (state->exit >= 0)
         return state->exit;
 
       draw(state);
-    } while (tty_input_ready(state->tty, state->ambiguous_key_pending));
+    } while (state->tty->input_ready(state->ambiguous_key_pending));
 
     if (state->ambiguous_key_pending) {
       char s[1] = "";

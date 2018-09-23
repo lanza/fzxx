@@ -21,7 +21,7 @@
   ['0'] = (v), ['1'] = (v), ['2'] = (v), ['3'] = (v), ['4'] = (v),             \
   ['5'] = (v), ['6'] = (v), ['7'] = (v), ['8'] = (v), ['9'] = (v)
 
-const score_t bonus_states[3][256] = {
+const double bonus_states[3][256] = {
     {0},
     {
         ['/'] = SCORE_MATCH_SLASH,

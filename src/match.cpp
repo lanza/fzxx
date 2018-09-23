@@ -10,8 +10,8 @@
 
 #include "../config.h"
 
-char *strcasechr(const char *s, char c) {
-  const char accept[3] = {c, toupper(c), 0};
+char const* strcasechr(const char *s, char c) {
+  const char accept[3] = {c, static_cast<char>(toupper(c)), 0};
   return strpbrk(s, accept);
 }
 

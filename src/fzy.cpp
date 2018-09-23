@@ -44,8 +44,8 @@ int main(int argc, char *argv[]) {
     if (isatty(STDIN_FILENO))
       choices_fread(&choices, stdin);
 
-    tty_t tty;
-    tty_init(&tty, options.tty_filename);
+    TTYWrapper tty;
+    tty.init(options.tty_filename);
 
     if (!isatty(STDIN_FILENO))
       choices_fread(&choices, stdin);
@@ -53,8 +53,8 @@ int main(int argc, char *argv[]) {
     if (options.num_lines > choices.size)
       options.num_lines = choices.size;
 
-    if (options.num_lines + 1 > tty_getheight(&tty))
-      options.num_lines = tty_getheight(&tty) - 1;
+    if (options.num_lines + 1 > tty.getheight())
+      options.num_lines = tty.getheight() - 1;
 
     tty_interface_t tty_interface;
     tty_interface_init(&tty_interface, &tty, &choices, &options);

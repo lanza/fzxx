@@ -58,7 +58,7 @@ void options_parse(options_t *options, int argc, char *argv[]) {
          -1) {
     switch (c) {
     case 'v':
-      printf("%s " VERSION " (c) 2014 John Hawthorn\n", argv[0]);
+      printf("%s (c) 2014 John Hawthorn\n", argv[0]);
       exit(EXIT_SUCCESS);
     case 's':
       options->show_scores = 1;

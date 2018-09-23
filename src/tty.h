@@ -3,29 +3,6 @@
 
 #include <termios.h>
 
-typedef struct {
-  int fdin;
-  FILE *fout;
-  struct termios original_termios;
-  int fgcolor;
-  size_t maxwidth;
-  size_t maxheight;
-} tty_t;
-
-void tty_reset(tty_t *tty);
-void tty_close(tty_t *tty);
-void tty_init(tty_t *tty, const char *tty_filename);
-void tty_getwinsz(tty_t *tty);
-char tty_getchar(tty_t *tty);
-int tty_input_ready(tty_t *tty, int pending);
-
-void tty_setfg(tty_t *tty, int fg);
-void tty_setinvert(tty_t *tty);
-void tty_setunderline(tty_t *tty);
-void tty_setnormal(tty_t *tty);
-void tty_setnowrap(tty_t *tty);
-void tty_setwrap(tty_t *tty);
-
 #define TTY_COLOR_BLACK 0
 #define TTY_COLOR_RED 1
 #define TTY_COLOR_GREEN 2
@@ -36,24 +13,47 @@ void tty_setwrap(tty_t *tty);
 #define TTY_COLOR_WHITE 7
 #define TTY_COLOR_NORMAL 9
 
-/* tty_newline
- * Move cursor to the beginning of the next line, clearing to the end of the
- * current line
- */
-void tty_newline(tty_t *tty);
+struct TTYWrapper {
+  int fdin;
+  FILE *fout;
+  struct termios original_termios;
+  int fgcolor;
+  size_t maxwidth;
+  size_t maxheight;
 
-/* tty_clearline
- * Clear to the end of the current line without advancing the cursor.
- */
-void tty_clearline(tty_t *tty);
+  void reset();
+  void close();
+  void init(const char *tty_filename);
+  void getwinsz();
+  char getchar();
+  int input_ready(int pending);
 
-void tty_moveup(tty_t *tty, int i);
-void tty_setcol(tty_t *tty, int col);
+  void setfg(int fg);
+  void setinvert();
+  void setunderline();
+  void setnormal();
+  void setnowrap();
+  void setwrap();
 
-void tty_printf(tty_t *tty, const char *fmt, ...);
-void tty_flush(tty_t *tty);
+  /* tty_newline
+   * Move cursor to the beginning of the next line, clearing to the end of the
+   * current line
+   */
+  void newline();
 
-size_t tty_getwidth(tty_t *tty);
-size_t tty_getheight(tty_t *tty);
+  /* tty_clearline
+   * Clear to the end of the current line without advancing the cursor.
+   */
+  void clearline();
+
+  void moveup(int i);
+  void setcol(int col);
+
+  void printf(const char *fmt, ...);
+  void flush();
+
+  size_t getwidth();
+  size_t getheight();
+};
 
 #endif

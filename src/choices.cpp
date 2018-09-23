@@ -1,4 +1,4 @@
-#include <errno.h>
+#include <cerrno>
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -16,8 +16,8 @@
 #define INITIAL_CHOICE_CAPACITY 128
 
 static int cmpchoice(const void *_idx1, const void *_idx2) {
-  const struct scored_result *a = _idx1;
-  const struct scored_result *b = _idx2;
+  const struct scored_result *a = static_cast<const struct scored_result*>(_idx1);
+  const struct scored_result *b = static_cast<const struct scored_result*>(_idx2);
 
   if (a->score == b->score) {
     /* To ensure a stable sort, we must also sort by the string
@@ -55,18 +55,19 @@ void choices_fread(choices_t *c, FILE *file) {
    * This must work even when c->buffer is NULL and c->buffer_size is 0
    */
   size_t capacity = INITIAL_BUFFER_CAPACITY;
-  while (capacity <= c->buffer_size)
+  while (capacity <= c->buffer_size) {
     capacity *= 2;
-  c->buffer = safe_realloc(c->buffer, capacity);
+  }
+  c->buffer = static_cast<char *>(safe_realloc(c->buffer, capacity));
 
   /* Continue reading until we get a "short" read, indicating EOF */
   while ((c->buffer_size += fread(c->buffer + c->buffer_size, 1,
                                   capacity - c->buffer_size, file)) ==
          capacity) {
     capacity *= 2;
-    c->buffer = safe_realloc(c->buffer, capacity);
+    c->buffer = static_cast<char *>(safe_realloc(c->buffer, capacity));
   }
-  c->buffer = safe_realloc(c->buffer, c->buffer_size + 1);
+  c->buffer = static_cast<char*>(safe_realloc(c->buffer, c->buffer_size + 1));
   c->buffer[c->buffer_size++] = '\0';
 
   /* Truncate buffer to used size, (maybe) freeing some memory for
@@ -89,7 +90,7 @@ void choices_fread(choices_t *c, FILE *file) {
 }
 
 static void choices_resize(choices_t *c, size_t new_capacity) {
-  c->strings = safe_realloc(c->strings, new_capacity * sizeof(const char *));
+  c->strings = static_cast<const char**>(safe_realloc(c->strings, new_capacity * sizeof(const char *)));
   c->capacity = new_capacity;
 }
 
@@ -188,7 +189,7 @@ static struct result_list merge2(struct result_list list1,
 
   struct result_list result;
   result.size = list1.size + list2.size;
-  result.list = malloc(result.size * sizeof(struct scored_result));
+  result.list = static_cast<struct scored_result*>(malloc(result.size * sizeof(struct scored_result)));
   if (!result.list) {
     fprintf(stderr, "Error: Can't allocate memory\n");
     abort();
@@ -265,22 +266,22 @@ static void *choices_search_worker(void *data) {
 void choices_search(choices_t *c, const char *search) {
   choices_reset_search(c);
 
-  struct search_job *job = calloc(1, sizeof(struct search_job));
+  struct search_job *job = static_cast<struct search_job*>(calloc(1, sizeof(struct search_job)));
   job->search = search;
   job->choices = c;
   if (pthread_mutex_init(&job->lock, NULL) != 0) {
     fprintf(stderr, "Error: pthread_mutex_init failed\n");
     abort();
   }
-  job->workers = calloc(c->worker_count, sizeof(struct worker));
+  job->workers = static_cast<struct worker*>(calloc(c->worker_count, sizeof(struct worker)));
 
   struct worker *workers = job->workers;
   for (int i = c->worker_count - 1; i >= 0; i--) {
     workers[i].job = job;
     workers[i].worker_num = i;
     workers[i].result.size = 0;
-    workers[i].result.list = malloc(
-        c->size * sizeof(struct scored_result)); /* FIXME: This is overkill */
+    workers[i].result.list = static_cast<struct scored_result*>(malloc(
+        c->size * sizeof(struct scored_result))); /* FIXME: This is overkill */
 
     /* These must be created last-to-first to avoid a race condition when
      * fanning in */
