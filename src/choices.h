@@ -7,24 +7,24 @@
 #include "options.h"
 
 struct scored_result {
-	score_t score;
-	const char *str;
+  score_t score;
+  const char *str;
 };
 
 typedef struct {
-	char *buffer;
-	size_t buffer_size;
+  char *buffer;
+  size_t buffer_size;
 
-	size_t capacity;
-	size_t size;
+  size_t capacity;
+  size_t size;
 
-	const char **strings;
-	struct scored_result *results;
+  const char **strings;
+  struct scored_result *results;
 
-	size_t available;
-	size_t selection;
+  size_t available;
+  size_t selection;
 
-	unsigned int worker_count;
+  unsigned int worker_count;
 } choices_t;
 
 void choices_init(choices_t *c, options_t *options);
