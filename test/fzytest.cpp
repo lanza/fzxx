@@ -7,11 +7,11 @@ SUITE(properties_suite);
 GREATEST_MAIN_DEFS();
 
 int main(int argc, char *argv[]) {
-	GREATEST_MAIN_BEGIN();
+  GREATEST_MAIN_BEGIN();
 
-	RUN_SUITE(match_suite);
-	RUN_SUITE(choices_suite);
-	RUN_SUITE(properties_suite);
+  RUN_SUITE(match_suite);
+  RUN_SUITE(choices_suite);
+  RUN_SUITE(properties_suite);
 
-	GREATEST_MAIN_END();
+  GREATEST_MAIN_END();
 }
